@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Register — Smart Surveillance</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    .box { 
+      max-width: 440px;
+      margin: 50px auto;
+      padding: 35px 30px;
+      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.08);
+      box-shadow: 0 12px 35px rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .box h2 { 
+      color: #ffea00;
+      text-align: center;
+      margin-bottom: 25px;
+      font-size: 28px;
+      text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.3);
+    }
+    
+    label {
+      display: block;
+      color: #e0e0e0;
+      margin-top: 16px;
+      margin-bottom: 6px;
+      font-weight: 500;
+      font-size: 14px;
+    }
+    
+    input {
+      width: 100%;
+      padding: 12px 15px;
+      border-radius: 10px;
+      border: 2px solid rgba(255, 255, 255, 0.15);
+      background: rgba(255, 255, 255, 0.05);
+      color: #fff;
+      font-size: 15px;
+      transition: all 0.3s ease;
+      box-sizing: border-box;
+    }
+    
+    input:focus {
+      outline: none;
+      border-color: #00d4ff;
+      background: rgba(255, 255, 255, 0.08);
+      box-shadow: 0 0 15px rgba(0, 212, 255, 0.3);
+    }
+    
+    input::placeholder {
+      color: rgba(255, 255, 255, 0.4);
+    }
+    
+    .password-wrapper {
+      position: relative;
+    }
+    
+    .toggle-password {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      cursor: pointer;
+      color: rgba(255, 255, 255, 0.5);
+      font-size: 18px;
+      user-select: none;
+    }
+    
+    .toggle-password:hover {
+      color: #00d4ff;
+    }
+    
+    .password-strength {
+      margin-top: 8px;
+      font-size: 12px;
+      display: none;
+    }
+    
+    .password-strength.weak { color: #ff6b6b; }
+    .password-strength.medium { color: #ffd93d; }
+    .password-strength.strong { color: #51cf66; }
+    
+    .btn {
+      width: 100%;
+      margin-top: 18px;
+      padding: 13px;
+      border-radius: 10px;
+      border: none;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 16px;
+      transition: all 0.3s ease;
+    }
+    
+    .btn-create {
+      background: linear-gradient(135deg, #00d4ff, #0099cc);
+      color: #fff;
+      box-shadow: 0 4px 15px rgba(0, 212, 255, 0.3);
+    }
+    
+    .btn-create:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(0, 212, 255, 0.5);
+    }
+    
+    .btn-create:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+    
+    .msg {
+      margin-top: 12px;
+      font-size: 13px;
+      padding: 10px;
+      border-radius: 8px;
+      display: none;
+      text-align: left;
+    }
+    
+    .msg.error {
+      color: #ff6b6b;
+      background: rgba(255, 107, 107, 0.1);
+      border-left: 3px solid #ff6b6b;
+    }
+    
+    .msg.success {
+      color: #51cf66;
+      background: rgba(81, 207, 102, 0.1);
+      border-left: 3px solid #51cf66;
+    }
+    
+    .footer-link {
+      margin-top: 20px;
+      text-align: center;
+      font-size: 14px;
+      color: #bcd;
+    }
+    
+    .footer-link a {
+      color: #00d4ff;
+      text-decoration: none;
+      font-weight: 600;
+      transition: color 0.3s ease;
+    }
+    
+    .footer-link a:hover {
+      color: #33e0ff;
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <img src="assets/niit-logo.png" alt="NIIT Logo" class="logo" />
+    <h1>Smart Movable and Controlled Video-Based Surveillance Bot Management System</h1>
+  </header>
+
+  <main>
+    <div class="box">
+      <h2>Create Account</h2>
+
+      <label for="name">Full Name</label>
+      <input id="name" type="text" placeholder="Enter your full name" required />
+
+      <label for="email">Email Address</label>
+      <input id="email" type="email" placeholder="you@example.com" required autocomplete="email" />
+
+      <label for="password">Password</label>
+      <div class="password-wrapper">
+        <input id="password" type="password" placeholder="Choose a strong password" required minlength="6" />
+        <span class="toggle-password" onclick="togglePassword('password')">👁️</span>
+      </div>
+      <div id="passwordStrength" class="password-strength"></div>
+
+      <label for="confirmPassword">Confirm Password</label>
+      <div class="password-wrapper">
+        <input id="confirmPassword" type="password" placeholder="Re-enter your password" required />
+        <span class="toggle-password" onclick="togglePassword('confirmPassword')">👁️</span>
+      </div>
+
+      <button class="btn btn-create" onclick="registerUser()">Create Account</button>
+      
+      <div class="msg" id="msg"></div>
+
+      <p class="footer-link">Already have an account? <a href="user.html">Login here</a></p>
+    </div>
+  </main>
+
+  <footer class="footer">© 2025 Smart Surveillance — NIIT University Project</footer>
+
+<script>
+  // Toggle password visibility
+  function togglePassword(fieldId) {
+    const input = document.getElementById(fieldId);
+    const toggleIcon = input.nextElementSibling;
+    
+    if (input.type === 'password') {
+      input.type = 'text';
+      toggleIcon.textContent = '🙈';
+    } else {
+      input.type = 'password';
+      toggleIcon.textContent = '👁️';
+    }
+  }
+
+  // Check password strength
+  document.getElementById('password').addEventListener('input', function() {
+    const pass = this.value;
+    const strengthEl = document.getElementById('passwordStrength');
+    
+    if (pass.length === 0) {
+      strengthEl.style.display = 'none';
+      return;
+    }
+    
+    strengthEl.style.display = 'block';
+    
+    if (pass.length < 6) {
+      strengthEl.className = 'password-strength weak';
+      strengthEl.textContent = '⚠️ Weak password (min 6 characters)';
+    } else if (pass.length < 10) {
+      strengthEl.className = 'password-strength medium';
+      strengthEl.textContent = '⚡ Medium password';
+    } else {
+      strengthEl.className = 'password-strength strong';
+      strengthEl.textContent = '✓ Strong password';
+    }
+  });
+
+  function registerUser() {
+    const name = document.getElementById('name').value.trim();
+    const email = document.getElementById('email').value.trim().toLowerCase();
+    const pass = document.getElementById('password').value;
+    const confirmPass = document.getElementById('confirmPassword').value;
+    const msgEl = document.getElementById('msg');
+
+    // Hide previous messages
+    msgEl.style.display = 'none';
+    msgEl.className = 'msg';
+
+    // Validation
+    if (!name || !email || !pass || !confirmPass) {
+      msgEl.className = 'msg error';
+      msgEl.textContent = '⚠️ Please fill all fields.';
+      msgEl.style.display = 'block';
+      return;
+    }
+
+    // Email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      msgEl.className = 'msg error';
+      msgEl.textContent = '⚠️ Please enter a valid email address.';
+      msgEl.style.display = 'block';
+      return;
+    }
+
+    // Password length check
+    if (pass.length < 6) {
+      msgEl.className = 'msg error';
+      msgEl.textContent = '⚠️ Password must be at least 6 characters long.';
+      msgEl.style.display = 'block';
+      return;
+    }
+
+    // Password match check
+    if (pass !== confirmPass) {
+      msgEl.className = 'msg error';
+      msgEl.textContent = '⚠️ Passwords do not match.';
+      msgEl.style.display = 'block';
+      return;
+    }
+
+    // Load existing users
+    const users = JSON.parse(localStorage.getItem('users') || '{}');
+
+    if (users[email]) {
+      msgEl.className = 'msg error';
+      msgEl.textContent = '⚠️ An account with this email already exists. Please login.';
+      msgEl.style.display = 'block';
+      return;
+    }
+
+    // Save user
+    users[email] = { name, password: pass };
+    localStorage.setItem('users', JSON.stringify(users));
+    
+    msgEl.className = 'msg success';
+    msgEl.textContent = '✓ Account created successfully! Redirecting to login...';
+    msgEl.style.display = 'block';
+
+    setTimeout(() => window.location.href = 'user.html', 1500);
+  }
+
+  // Allow Enter key to submit
+  document.getElementById('confirmPassword').addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') {
+      registerUser();
+    }
+  });
+</script>
+</body>
+</html>

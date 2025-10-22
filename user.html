@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>User Login — Smart Surveillance</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    /* Enhanced login box styling */
+    .login-box {
+      max-width: 440px;
+      margin: 40px auto;
+      background: rgba(255, 255, 255, 0.08);
+      padding: 35px 30px;
+      border-radius: 16px;
+      box-shadow: 0 12px 35px rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    h2 {
+      color: #ffea00;
+      text-align: center;
+      margin-bottom: 25px;
+      font-size: 28px;
+      text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.3);
+    }
+
+    label {
+      display: block;
+      color: #e0e0e0;
+      margin-top: 16px;
+      margin-bottom: 6px;
+      font-weight: 500;
+      font-size: 14px;
+    }
+
+    input {
+      width: 100%;
+      padding: 12px 15px;
+      border-radius: 10px;
+      border: 2px solid rgba(255, 255, 255, 0.15);
+      background: rgba(255, 255, 255, 0.05);
+      color: #fff;
+      font-size: 15px;
+      transition: all 0.3s ease;
+      box-sizing: border-box;
+    }
+
+    input:focus {
+      outline: none;
+      border-color: #00d4ff;
+      background: rgba(255, 255, 255, 0.08);
+      box-shadow: 0 0 15px rgba(0, 212, 255, 0.3);
+    }
+
+    input::placeholder {
+      color: rgba(255, 255, 255, 0.4);
+    }
+
+    .btn {
+      width: 100%;
+      margin-top: 18px;
+      padding: 13px;
+      border-radius: 10px;
+      border: none;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 16px;
+      transition: all 0.3s ease;
+    }
+
+    .btn-login {
+      background: linear-gradient(135deg, #00d4ff, #0099cc);
+      color: #fff;
+      box-shadow: 0 4px 15px rgba(0, 212, 255, 0.3);
+    }
+
+    .btn-login:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(0, 212, 255, 0.5);
+    }
+
+    .btn-login:active {
+      transform: translateY(0);
+    }
+
+    .btn-back {
+      background: rgba(255, 255, 255, 0.05);
+      color: #aeeaff;
+      border: 2px solid rgba(174, 234, 255, 0.3);
+    }
+
+    .btn-back:hover {
+      background: rgba(255, 255, 255, 0.1);
+      border-color: rgba(174, 234, 255, 0.5);
+    }
+
+    .small-note {
+      font-size: 14px;
+      color: #bcd;
+      margin-top: 20px;
+      text-align: center;
+    }
+
+    .small-note a {
+      color: #00d4ff;
+      text-decoration: none;
+      font-weight: 600;
+      transition: color 0.3s ease;
+    }
+
+    .small-note a:hover {
+      color: #33e0ff;
+      text-decoration: underline;
+    }
+
+    .error {
+      color: #ff6b6b;
+      background: rgba(255, 107, 107, 0.1);
+      font-size: 13px;
+      margin-top: 12px;
+      padding: 10px;
+      border-radius: 8px;
+      border-left: 3px solid #ff6b6b;
+      display: none;
+      text-align: left;
+    }
+
+    .success {
+      color: #51cf66;
+      background: rgba(81, 207, 102, 0.1);
+      font-size: 13px;
+      margin-top: 12px;
+      padding: 10px;
+      border-radius: 8px;
+      border-left: 3px solid #51cf66;
+      display: none;
+      text-align: left;
+    }
+
+    /* Password toggle icon */
+    .password-wrapper {
+      position: relative;
+    }
+
+    .toggle-password {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      cursor: pointer;
+      color: rgba(255, 255, 255, 0.5);
+      font-size: 18px;
+      user-select: none;
+    }
+
+    .toggle-password:hover {
+      color: #00d4ff;
+    }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <img src="assets/niit-logo.png" alt="NIIT Logo" class="logo" />
+    <h1>Smart Movable and Controlled Video-Based Surveillance Bot Management System</h1>
+  </header>
+
+  <main style="padding:40px 20px 80px;">
+    <div class="login-box">
+      <h2>User Login</h2>
+
+      <label for="email">Email Address</label>
+      <input id="email" type="email" placeholder="your@example.com" autocomplete="email" />
+
+      <label for="password">Password</label>
+      <div class="password-wrapper">
+        <input id="password" type="password" placeholder="Enter your password" autocomplete="current-password" />
+        <span class="toggle-password" onclick="togglePassword()">👁️</span>
+      </div>
+
+      <div id="errorMsg" class="error"></div>
+      <div id="successMsg" class="success"></div>
+
+      <button class="btn btn-login" onclick="handleLogin()">Login</button>
+      <button class="btn btn-back" onclick="location.href='index.html'">Back to Home</button>
+
+      <p class="small-note">Don't have an account? <a href="register.html">Register here</a></p>
+    </div>
+  </main>
+
+  <footer class="footer">© 2025 Smart Surveillance — NIIT University Project</footer>
+
+<script>
+  // Create demo account that always exists
+  (function() {
+    const users = JSON.parse(localStorage.getItem('users') || '{}');
+    if (!users['demo@test.com']) {
+      users['demo@test.com'] = { name: 'Demo User', password: 'demo123' };
+      localStorage.setItem('users', JSON.stringify(users));
+    }
+  })();
+  
+  // Toggle password visibility
+  function togglePassword() {
+    const passInput = document.getElementById('password');
+    const toggleIcon = document.querySelector('.toggle-password');
+    
+    if (passInput.type === 'password') {
+      passInput.type = 'text';
+      toggleIcon.textContent = '🙈';
+    } else {
+      passInput.type = 'password';
+      toggleIcon.textContent = '👁️';
+    }
+  }
+
+  function handleLogin() {
+    const email = (document.getElementById('email').value || '').trim().toLowerCase();
+    const pass = (document.getElementById('password').value || '').trim();
+    const errMsg = document.getElementById('errorMsg');
+    const successMsg = document.getElementById('successMsg');
+
+    // Hide previous messages
+    errMsg.style.display = 'none';
+    successMsg.style.display = 'none';
+
+    // Validation
+    if (!email || !pass) {
+      errMsg.textContent = '⚠️ Please enter both email and password.';
+      errMsg.style.display = 'block';
+      return;
+    }
+
+    // Email format validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      errMsg.textContent = '⚠️ Please enter a valid email address.';
+      errMsg.style.display = 'block';
+      return;
+    }
+
+    const users = JSON.parse(localStorage.getItem('users') || '{}');
+
+    if (users[email] && users[email].password === pass) {
+      // Login success
+      successMsg.textContent = '✓ Login successful! Redirecting...';
+      successMsg.style.display = 'block';
+      
+      localStorage.setItem('userName', users[email].name || email.split('@')[0]);
+      
+      setTimeout(() => {
+        window.location.href = 'user-dashboard.html';
+      }, 800);
+    } else {
+      errMsg.textContent = '✗ Invalid email or password. If you\'re new, please register first.';
+      errMsg.style.display = 'block';
+    }
+  }
+
+  // Allow Enter key to submit
+  document.getElementById('password').addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') {
+      handleLogin();
+    }
+  });
+
+  document.getElementById('email').addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') {
+      handleLogin();
+    }
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>User Dashboard — Temperature & Humidity</title>
+  <link rel="stylesheet" href="style.css"/>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    .dash { 
+      max-width: 1200px; 
+      margin: 30px auto; 
+      padding: 20px; 
+      color: #fff; 
+    }
+    
+    .header-row { 
+      display: flex; 
+      justify-content: space-between; 
+      align-items: center; 
+      gap: 15px; 
+      flex-wrap: wrap;
+      margin-bottom: 25px;
+    }
+    
+    .card { 
+      background: rgba(255, 255, 255, 0.08); 
+      padding: 25px; 
+      border-radius: 16px; 
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      transition: transform 0.3s ease;
+    }
+    
+    .card:hover {
+      transform: translateY(-3px);
+    }
+    
+    .grid2 { 
+      display: grid; 
+      grid-template-columns: 1fr 1fr; 
+      gap: 25px; 
+      margin-top: 25px; 
+      align-items: start; 
+    }
+    
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+      margin-bottom: 25px;
+    }
+    
+    .stat-card {
+      background: linear-gradient(135deg, rgba(0, 212, 255, 0.15), rgba(0, 150, 255, 0.1));
+      padding: 20px;
+      border-radius: 12px;
+      border: 1px solid rgba(0, 212, 255, 0.3);
+      text-align: center;
+    }
+    
+    .stat-value {
+      font-size: 48px;
+      font-weight: bold;
+      color: #00d4ff;
+      margin: 10px 0;
+    }
+    
+    .stat-label {
+      font-size: 14px;
+      color: #aaa;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    
+    h2.title { 
+      text-align: center; 
+      font-size: 40px; 
+      color: #ffea00; 
+      letter-spacing: 2px; 
+      margin: 0;
+      text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.3);
+    }
+    
+    .chart-wrap { 
+      background: #fff; 
+      padding: 15px; 
+      border-radius: 10px;
+      margin-top: 15px;
+    }
+    
+    .note { 
+      color: #bcd; 
+      font-size: 13px; 
+      margin-top: 12px;
+      text-align: center;
+    }
+    
+    .controls {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+    
+    .btn {
+      padding: 10px 20px;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 14px;
+      transition: all 0.3s ease;
+    }
+    
+    .btn-refresh {
+      background: linear-gradient(135deg, #00d4ff, #0099cc);
+      color: #fff;
+    }
+    
+    .btn-refresh:hover {
+      transform: scale(1.05);
+      box-shadow: 0 4px 15px rgba(0, 212, 255, 0.4);
+    }
+    
+    .btn-logout {
+      background: rgba(255, 255, 255, 0.1);
+      color: #fff;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    
+    .btn-logout:hover {
+      background: rgba(255, 255, 255, 0.2);
+    }
+    
+    .status {
+      padding: 12px 20px;
+      border-radius: 8px;
+      margin: 20px 0;
+      text-align: center;
+      font-size: 14px;
+    }
+    
+    .status.loading {
+      background: rgba(0, 212, 255, 0.1);
+      border-left: 4px solid #00d4ff;
+      color: #00d4ff;
+    }
+    
+    .status.error {
+      background: rgba(255, 107, 107, 0.1);
+      border-left: 4px solid #ff6b6b;
+      color: #ff6b6b;
+    }
+    
+    .status.success {
+      background: rgba(81, 207, 102, 0.1);
+      border-left: 4px solid #51cf66;
+      color: #51cf66;
+    }
+    
+    .last-updated {
+      font-size: 12px;
+      color: #888;
+      text-align: center;
+      margin-top: 10px;
+    }
+
+    @media (max-width: 768px) {
+      .grid2 {
+        grid-template-columns: 1fr;
+      }
+      .header-row {
+        flex-direction: column;
+      }
+      h2.title {
+        font-size: 28px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <img src="assets/niit-logo.png" alt="NIIT Logo" class="logo"/>
+    <h1>Smart Movable and Controlled Video-Based Surveillance Bot Management System</h1>
+  </header>
+
+  <main class="dash">
+    <div class="header-row">
+      <h2 class="title">USER DASHBOARD</h2>
+      <div class="controls">
+        <span id="greet" style="font-weight:600; color:#ffea00; margin-right:10px;"></span>
+        <button class="btn btn-refresh" onclick="loadData()">🔄 Refresh</button>
+        <button class="btn btn-logout" onclick="logout()">Logout</button>
+      </div>
+    </div>
+
+    <!-- Current Values -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-label">Current Temperature</div>
+        <div class="stat-value" id="currentTemp">--</div>
+        <div class="stat-label">°C</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Current Humidity</div>
+        <div class="stat-value" id="currentHum">--</div>
+        <div class="stat-label">%</div>
+      </div>
+    </div>
+
+    <div id="statusNote" class="status loading">Loading sensor data...</div>
+    <div class="last-updated" id="lastUpdated"></div>
+
+    <!-- Charts -->
+    <div class="grid2">
+      <div class="card">
+        <h3 style="color: #ffea00;">📈 TEMPERATURE</h3>
+        <div class="chart-wrap"><canvas id="chartTemp" height="220"></canvas></div>
+        <div class="note">Temperature over time (°C)</div>
+      </div>
+
+      <div class="card">
+        <h3 style="color: #00d4ff;">💧 HUMIDITY</h3>
+        <div class="chart-wrap"><canvas id="chartHum" height="220"></canvas></div>
+        <div class="note">Humidity over time (%)</div>
+      </div>
+    </div>
+
+    <!-- Activity Log Section -->
+    <div style="margin-top: 30px; background: rgba(255, 255, 255, 0.05); padding: 25px; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.1);">
+      <h3 style="color: #ffcc00; margin-bottom: 20px;">📋 System Activity Log</h3>
+      
+      <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+        <button onclick="refreshActivityLog()" style="padding: 10px 20px; background: linear-gradient(135deg, #00d4ff, #0099cc); color: #fff; border: none; border-radius: 6px; font-weight: 600; cursor: pointer;">
+          🔄 Refresh
+        </button>
+        <button onclick="clearActivityLog()" style="padding: 10px 20px; background: rgba(255, 107, 107, 0.2); color: #ff6b6b; border: 1px solid #ff6b6b; border-radius: 6px; font-weight: 600; cursor: pointer;">
+          🗑️ Clear Logs
+        </button>
+      </div>
+      
+      <div id="activityLogsList" style="max-height: 350px; overflow-y: auto; background: rgba(0,0,0,0.3); padding: 15px; border-radius: 8px;">
+        <!-- Activity logs will be shown here -->
+      </div>
+    </div>
+
+  </main>
+
+  <footer class="footer">© 2025 Smart Surveillance — NIIT University Project</footer>
+
+<script>
+/* ====== CONFIGURE THESE VALUES ====== */
+const CHANNEL_ID = 3118106;
+const READ_API_KEY = 'Z4MZRYY52ERGPPB5';
+const TEMP_FIELD = 1;
+const HUM_FIELD  = 2;
+const NUM_POINTS = 30;
+const AUTO_REFRESH_SECONDS = 60;
+
+function thingspeakUrl(channelId, apiKey='', results=NUM_POINTS){
+  let url = `https://api.thingspeak.com/channels/${channelId}/feeds.json?results=${results}`;
+  if(apiKey) url += `&api_key=${apiKey}`;
+  return url;
+}
+
+async function fetchJSON(url){
+  const res = await fetch(url);
+  if(!res.ok) throw new Error('HTTP ' + res.status);
+  return res.json();
+}
+
+function extractField(feeds, fieldIndex){
+  const labels = [], values = [];
+  for(const f of feeds){
+    labels.push(f.created_at.replace('T',' ').replace('Z',''));
+    const v = f['field' + fieldIndex];
+    values.push(v !== null ? Number(v) : null);
+  }
+  return { labels, values };
+}
+
+let charts = {};
+function createChart(id, labels, datasets, opts={}){
+  const ctx = document.getElementById(id).getContext('2d');
+  if(charts[id]) charts[id].destroy();
+  charts[id] = new Chart(ctx, {
+    type: 'line',
+    data: { labels, datasets },
+    options: {
+      maintainAspectRatio: false,
+      interaction: { mode: 'index', intersect: false },
+      plugins: { legend: { display: true } },
+      scales: { x: { display: true }, y: { display: true } },
+      ...opts
+    }
+  });
+}
+
+async function loadData(){
+  const status = document.getElementById('statusNote');
+  const lastUpdated = document.getElementById('lastUpdated');
+  
+  status.className = 'status loading';
+  status.textContent = '⏳ Fetching latest sensor data...';
+
+  try {
+    const url = thingspeakUrl(CHANNEL_ID, READ_API_KEY, NUM_POINTS);
+    const json = await fetchJSON(url);
+    if(!json || !json.feeds) throw new Error('Invalid ThingSpeak response');
+
+    const temp = extractField(json.feeds, TEMP_FIELD);
+    createChart('chartTemp', temp.labels, [
+      { label: 'Temperature (°C)', data: temp.values, borderColor:'#ff9900', backgroundColor:'rgba(255,153,0,0.15)', tension:0.3, fill: true }
+    ], { scales: { y: { beginAtZero: false } }});
+
+    const hum = extractField(json.feeds, HUM_FIELD);
+    createChart('chartHum', hum.labels, [
+      { label: 'Humidity (%)', data: hum.values, borderColor:'#00aaff', backgroundColor:'rgba(0,170,255,0.12)', tension:0.3, fill: true }
+    ], { scales: { y: { beginAtZero: true } }});
+
+    const latestTemp = temp.values[temp.values.length - 1];
+    const latestHum = hum.values[hum.values.length - 1];
+    
+    document.getElementById('currentTemp').textContent = latestTemp !== null ? latestTemp.toFixed(1) : '--';
+    document.getElementById('currentHum').textContent = latestHum !== null ? latestHum.toFixed(1) : '--';
+
+    status.className = 'status success';
+    status.textContent = '✓ Data loaded successfully!';
+    
+    const now = new Date().toLocaleString();
+    lastUpdated.textContent = `Last updated: ${now}`;
+    
+    // Log sensor update
+    logSensorUpdate(latestTemp !== null ? latestTemp.toFixed(1) : null, 
+                    latestHum !== null ? latestHum.toFixed(1) : null);
+    
+  } catch(err){
+    console.error(err);
+    status.className = 'status error';
+    status.innerHTML = '✗ Failed to load data: ' + (err.message || err) + 
+      '<br/>Check your ThingSpeak channel settings and API key.';
+    lastUpdated.textContent = '';
+    addActivityLog('Failed to load sensor data: ' + err.message, 'error');
+  }
+}
+
+// ============================================
+// ACTIVITY LOG SYSTEM
+// ============================================
+function addActivityLog(message, type = 'info') {
+  const logs = JSON.parse(localStorage.getItem('activityLogs') || '[]');
+  
+  logs.unshift({
+    message: message,
+    type: type,
+    time: new Date().toLocaleString()
+  });
+  
+  // Keep only last 100 logs
+  if (logs.length > 100) logs.pop();
+  
+  localStorage.setItem('activityLogs', JSON.stringify(logs));
+}
+
+function loadActivityLogs() {
+  const logs = JSON.parse(localStorage.getItem('activityLogs') || '[]');
+  const listDiv = document.getElementById('activityLogsList');
+  
+  if (logs.length === 0) {
+    listDiv.innerHTML = '<p style="color:#888; font-size: 14px;">No activity recorded yet.</p>';
+    return;
+  }
+  
+  const typeIcons = {
+    'info': 'ℹ️',
+    'warning': '⚠️',
+    'error': '❌',
+    'success': '✅',
+    'sensor': '📡',
+    'security': '🔒'
+  };
+  
+  const typeColors = {
+    'info': '#00d4ff',
+    'warning': '#ffcc00',
+    'error': '#ff6b6b',
+    'success': '#51cf66',
+    'sensor': '#00d4ff',
+    'security': '#ff9900'
+  };
+  
+  listDiv.innerHTML = logs.slice(0, 50).map(log => `
+    <div style="padding: 12px; margin-bottom: 8px; background: rgba(255,255,255,0.05); border-radius: 6px; border-left: 3px solid ${typeColors[log.type] || '#00d4ff'};">
+      <div style="display: flex; justify-content: space-between; align-items: start;">
+        <p style="margin: 0; font-size: 14px;">
+          ${typeIcons[log.type] || 'ℹ️'} ${log.message}
+        </p>
+      </div>
+      <small style="color: #888; font-size: 12px;">📅 ${log.time}</small>
+    </div>
+  `).join('');
+}
+
+function refreshActivityLog() {
+  loadActivityLogs();
+  addActivityLog('Activity log refreshed', 'info');
+  loadActivityLogs();
+}
+
+function clearActivityLog() {
+  if (confirm('Are you sure you want to clear all activity logs?')) {
+    localStorage.setItem('activityLogs', '[]');
+    loadActivityLogs();
+    addActivityLog('Activity logs cleared by user', 'warning');
+    loadActivityLogs();
+  }
+}
+
+function logSensorUpdate(temp, hum) {
+  if (temp && hum) {
+    addActivityLog(`Sensor data updated: ${temp}°C, ${hum}%`, 'sensor');
+  }
+}
+
+window.addEventListener('load', ()=>{
+  const name = localStorage.getItem('userName') || 'User';
+  document.getElementById('greet').textContent = `Welcome, ${name}!`;
+  addActivityLog(`User ${name} logged in`, 'success');
+  loadData();
+  loadActivityLogs();
+  
+  setInterval(loadData, AUTO_REFRESH_SECONDS * 1000);
+});
+
+function logout(){ 
+  if(confirm('Are you sure you want to logout?')) {
+    const name = localStorage.getItem('userName') || 'User';
+    addActivityLog(`User ${name} logged out`, 'info');
+    window.location.href = 'index.html'; 
+  }
+}
+</script>
+</body>
+</html>

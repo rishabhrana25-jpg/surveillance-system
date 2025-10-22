@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Admin Login — Smart Surveillance</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    .login-box {
+      max-width: 440px;
+      margin: 40px auto;
+      background: rgba(255, 255, 255, 0.08);
+      padding: 35px 30px;
+      border-radius: 16px;
+      box-shadow: 0 12px 35px rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .login-box h2 {
+      color: #ffea00;
+      margin-bottom: 25px;
+      text-align: center;
+      font-size: 28px;
+      text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.3);
+    }
+
+    .login-box label {
+      display: block;
+      font-size: 14px;
+      color: #e0e0e0;
+      margin: 16px 0 6px;
+      font-weight: 500;
+    }
+
+    .login-box input {
+      width: 100%;
+      padding: 12px 15px;
+      border-radius: 10px;
+      border: 2px solid rgba(255, 255, 255, 0.15);
+      background: rgba(255, 255, 255, 0.05);
+      color: #fff;
+      outline: none;
+      font-size: 15px;
+      transition: all 0.3s ease;
+      box-sizing: border-box;
+    }
+
+    .login-box input:focus {
+      border-color: #ffcc00;
+      background: rgba(255, 255, 255, 0.08);
+      box-shadow: 0 0 15px rgba(255, 204, 0, 0.3);
+    }
+
+    .login-box input::placeholder {
+      color: rgba(255, 255, 255, 0.4);
+    }
+
+    .password-wrapper {
+      position: relative;
+    }
+
+    .toggle-password {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      cursor: pointer;
+      color: rgba(255, 255, 255, 0.5);
+      font-size: 18px;
+      user-select: none;
+    }
+
+    .toggle-password:hover {
+      color: #ffcc00;
+    }
+
+    .login-box button {
+      width: 100%;
+      margin-top: 18px;
+      padding: 13px;
+      border-radius: 10px;
+      border: none;
+      font-weight: 600;
+      font-size: 16px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .btn-login {
+      background: linear-gradient(135deg, #ffcc00, #ff9900);
+      color: #2a2001;
+      box-shadow: 0 4px 15px rgba(255, 204, 0, 0.3);
+    }
+
+    .btn-login:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(255, 204, 0, 0.5);
+    }
+
+    .btn-back {
+      background: rgba(255, 255, 255, 0.05);
+      color: #aeeaff;
+      border: 2px solid rgba(174, 234, 255, 0.3);
+      margin-top: 10px;
+    }
+
+    .btn-back:hover {
+      background: rgba(255, 255, 255, 0.1);
+      border-color: rgba(174, 234, 255, 0.5);
+    }
+
+    .error {
+      color: #ff6b6b;
+      background: rgba(255, 107, 107, 0.1);
+      font-size: 13px;
+      margin-top: 12px;
+      padding: 10px;
+      border-radius: 8px;
+      border-left: 3px solid #ff6b6b;
+      display: none;
+      text-align: left;
+    }
+
+    .success {
+      color: #51cf66;
+      background: rgba(81, 207, 102, 0.1);
+      font-size: 13px;
+      margin-top: 12px;
+      padding: 10px;
+      border-radius: 8px;
+      border-left: 3px solid #51cf66;
+      display: none;
+      text-align: left;
+    }
+
+    .admin-badge {
+      text-align: center;
+      color: #ffcc00;
+      font-size: 48px;
+      margin-bottom: 15px;
+    }
+  </style>
+</head>
+<body>
+
+  <header class="header">
+    <img src="assets/niit-logo.png" alt="NIIT Logo" class="logo" />
+    <h1>Smart Movable and Controlled Video-Based Surveillance Bot Management System</h1>
+  </header>
+
+  <main style="padding:40px 20px 80px;">
+    <div class="login-box" role="region" aria-labelledby="loginTitle">
+      <div class="admin-badge">🔐</div>
+      <h2 id="loginTitle">Admin Login</h2>
+
+      <form id="loginForm" onsubmit="return handleAdminLogin(event)">
+        <label for="username">Admin Username</label>
+        <input id="username" type="text" placeholder="Enter admin username" required autocomplete="username" />
+
+        <label for="password">Password</label>
+        <div class="password-wrapper">
+          <input id="password" type="password" placeholder="Enter your password" required minlength="4" autocomplete="current-password" />
+          <span class="toggle-password" onclick="togglePassword()">👁️</span>
+        </div>
+
+        <div id="errorMsg" class="error"></div>
+        <div id="successMsg" class="success"></div>
+
+        <button type="submit" class="btn-login">Login as Admin</button>
+        <button type="button" class="btn-back" onclick="location.href='index.html'">Back to Home</button>
+      </form>
+    </div>
+  </main>
+
+  <footer class="footer">
+    © 2025 Smart Surveillance — NIIT University Project
+  </footer>
+
+<script>
+  // Toggle password visibility
+  function togglePassword() {
+    const passInput = document.getElementById('password');
+    const toggleIcon = document.querySelector('.toggle-password');
+    
+    if (passInput.type === 'password') {
+      passInput.type = 'text';
+      toggleIcon.textContent = '🙈';
+    } else {
+      passInput.type = 'password';
+      toggleIcon.textContent = '👁️';
+    }
+  }
+
+  function handleAdminLogin(e) {
+    e.preventDefault();
+    
+    const user = document.getElementById('username').value.trim();
+    const pass = document.getElementById('password').value.trim();
+    const errMsg = document.getElementById('errorMsg');
+    const successMsg = document.getElementById('successMsg');
+
+    // Hide previous messages
+    errMsg.style.display = 'none';
+    successMsg.style.display = 'none';
+
+    // Validation
+    if (!user || !pass) {
+      errMsg.textContent = '⚠️ Please enter both username and password.';
+      errMsg.style.display = 'block';
+      return false;
+    }
+
+    // Demo credential check (username: admin, password: 1234)
+    if (user === 'admin' && pass === '1234') {
+      successMsg.textContent = '✓ Login successful! Redirecting to dashboard...';
+      successMsg.style.display = 'block';
+      
+      localStorage.setItem('adminName', user);
+      
+      setTimeout(() => {
+        window.location.href = 'admin-dashboard.html';
+      }, 800);
+    } else {
+      errMsg.textContent = '✗ Invalid username or password. Please try again.';
+      errMsg.style.display = 'block';
+    }
+    
+    return false;
+  }
+
+  // Allow Enter key to submit
+  document.getElementById('password').addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') {
+      handleAdminLogin(e);
+    }
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,965 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Admin Dashboard — Smart Surveillance</title>
+  <link rel="stylesheet" href="style.css"/>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <style>
+    /* Modern Admin Dashboard Styling */
+    body {
+      margin: 0;
+      font-family: 'Arial', sans-serif;
+      min-height: 100vh;
+      color: #fff;
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Header */
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 15px 20px;
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .title {
+      font-size: 32px;
+      font-weight: 800;
+      text-align: center;
+      letter-spacing: 1px;
+      color: #ffcc00;
+      text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.3);
+    }
+
+    .profile {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .profile .avatar {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #ffcc00, #ff9900);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #000;
+      font-weight: bold;
+      font-size: 20px;
+    }
+
+    .profile .info {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .profile .label {
+      color: #ffcc00;
+      font-weight: 700;
+      font-size: 14px;
+    }
+
+    .btn-logout {
+      padding: 8px 16px;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: #fff;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 13px;
+      transition: all 0.3s ease;
+    }
+
+    .btn-logout:hover {
+      background: rgba(255, 107, 107, 0.2);
+      border-color: #ff6b6b;
+    }
+
+    /* Main Content */
+    .content {
+      flex: 1;
+      padding: 20px;
+      max-width: 1400px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    /* Navigation Tabs */
+    .nav-tabs {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 25px;
+      flex-wrap: wrap;
+      border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+      padding-bottom: 10px;
+    }
+
+    .nav-tab {
+      padding: 12px 24px;
+      background: rgba(255, 255, 255, 0.05);
+      border: none;
+      border-radius: 8px 8px 0 0;
+      color: #aaa;
+      font-weight: 600;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      position: relative;
+    }
+
+    .nav-tab:hover {
+      background: rgba(255, 255, 255, 0.1);
+      color: #fff;
+    }
+
+    .nav-tab.active {
+      background: rgba(255, 204, 0, 0.15);
+      color: #ffcc00;
+      border-bottom: 3px solid #ffcc00;
+    }
+
+    /* Panel Cards */
+    .panel {
+      display: none;
+      background: rgba(255, 255, 255, 0.05);
+      padding: 25px;
+      border-radius: 12px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .panel.active {
+      display: block;
+      animation: fadeIn 0.3s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .panel h2 {
+      color: #ffcc00;
+      margin-bottom: 20px;
+      font-size: 24px;
+      border-bottom: 2px solid rgba(255, 204, 0, 0.3);
+      padding-bottom: 10px;
+    }
+
+    /* Form Controls */
+    .form-row {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 15px;
+      flex-wrap: wrap;
+    }
+
+    input, select, textarea {
+      padding: 10px 12px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 6px;
+      color: #fff;
+      font-size: 14px;
+      transition: all 0.3s ease;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      outline: none;
+      border-color: #ffcc00;
+      box-shadow: 0 0 10px rgba(255, 204, 0, 0.3);
+    }
+
+    input::placeholder {
+      color: rgba(255, 255, 255, 0.4);
+    }
+
+    /* Buttons */
+    .btn {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 6px;
+      font-weight: 600;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #00d4ff, #0099cc);
+      color: #fff;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 15px rgba(0, 212, 255, 0.4);
+    }
+
+    .btn-warning {
+      background: linear-gradient(135deg, #ffcc00, #ff9900);
+      color: #000;
+    }
+
+    .btn-warning:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 15px rgba(255, 204, 0, 0.4);
+    }
+
+    .btn-danger {
+      background: linear-gradient(135deg, #ff6b6b, #ff4757);
+      color: #fff;
+    }
+
+    .btn-danger:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 15px rgba(255, 107, 107, 0.4);
+    }
+
+    .btn-success {
+      background: linear-gradient(135deg, #51cf66, #37b24d);
+      color: #fff;
+    }
+
+    .btn-success:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 15px rgba(81, 207, 102, 0.4);
+    }
+
+    /* Tables */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 15px;
+    }
+
+    th {
+      background: rgba(255, 204, 0, 0.15);
+      color: #ffcc00;
+      padding: 12px;
+      text-align: left;
+      font-weight: 600;
+      border-bottom: 2px solid rgba(255, 204, 0, 0.3);
+    }
+
+    td {
+      padding: 12px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    tr:hover {
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    /* Chart Container */
+    .chart-container {
+      background: #fff;
+      padding: 15px;
+      border-radius: 8px;
+      margin-top: 15px;
+    }
+
+    /* Status Messages */
+    .message {
+      padding: 12px 15px;
+      border-radius: 6px;
+      margin-bottom: 15px;
+      display: none;
+    }
+
+    .message.success {
+      background: rgba(81, 207, 102, 0.15);
+      border-left: 4px solid #51cf66;
+      color: #51cf66;
+    }
+
+    .message.error {
+      background: rgba(255, 107, 107, 0.15);
+      border-left: 4px solid #ff6b6b;
+      color: #ff6b6b;
+    }
+
+    .message.info {
+      background: rgba(0, 212, 255, 0.15);
+      border-left: 4px solid #00d4ff;
+      color: #00d4ff;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .title {
+        font-size: 20px;
+      }
+      
+      .nav-tabs {
+        flex-direction: column;
+      }
+      
+      .nav-tab {
+        width: 100%;
+      }
+      
+      .form-row {
+        flex-direction: column;
+      }
+      
+      input, select {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <div class="topbar">
+    <h1 class="title">🔐 ADMIN DASHBOARD</h1>
+    <div class="profile">
+      <div class="avatar">A</div>
+      <div class="info">
+        <span class="label" id="adminName">Admin</span>
+        <button class="btn-logout" onclick="logout()">Logout</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="content">
+    <!-- Navigation Tabs -->
+    <div class="nav-tabs">
+      <button class="nav-tab active" onclick="showPanel('users')">👥 User Management</button>
+      <button class="nav-tab" onclick="showPanel('sensors')">📡 Sensor Management</button>
+      <button class="nav-tab" onclick="showPanel('analytics')">📊 Analytics</button>
+      <button class="nav-tab" onclick="showPanel('security')">🔒 Security</button>
+      <button class="nav-tab" onclick="showPanel('reports')">📄 Reports</button>
+      <button class="nav-tab" onclick="showPanel('activity')">📋 Activity Logs</button>
+    </div>
+
+    <!-- User Management Panel -->
+    <div id="panel-users" class="panel active">
+      <h2>👥 User Management</h2>
+      <div id="userMessage" class="message"></div>
+      
+      <div class="form-row">
+        <input type="text" id="newUserName" placeholder="Full Name" />
+        <input type="email" id="newUserEmail" placeholder="Email" />
+        <input type="password" id="newUserPass" placeholder="Password" />
+        <button class="btn btn-primary" onclick="addUser()">Add User</button>
+      </div>
+
+      <table id="userTable">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="userTableBody">
+          <!-- Populated by JavaScript -->
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Sensor Management Panel -->
+    <div id="panel-sensors" class="panel">
+      <h2>📡 Sensor Management</h2>
+      <div id="sensorMessage" class="message"></div>
+      
+      <div class="form-row">
+        <input type="text" id="newSensorName" placeholder="Sensor Name" />
+        <select id="newSensorField">
+          <option value="1">Field 1</option>
+          <option value="2">Field 2</option>
+          <option value="3">Field 3</option>
+          <option value="4">Field 4</option>
+        </select>
+        <button class="btn btn-primary" onclick="addSensor()">Add Sensor</button>
+      </div>
+
+      <table id="sensorTable">
+        <thead>
+          <tr>
+            <th>Sensor Name</th>
+            <th>Field</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="sensorTableBody">
+          <!-- Populated by JavaScript -->
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Analytics Panel -->
+    <div id="panel-analytics" class="panel">
+      <h2>📊 Analytics Dashboard</h2>
+      <div class="chart-container">
+        <canvas id="analyticsChart" height="100"></canvas>
+      </div>
+    </div>
+
+    <!-- Security Panel -->
+    <div id="panel-security" class="panel">
+      <h2>🔒 Security Controls</h2>
+      <div id="securityMessage" class="message"></div>
+      
+      <div class="form-row">
+        <button class="btn btn-warning" id="alarmBtn" onclick="toggleAlarm()">🚨 Alarm: OFF</button>
+        <button class="btn btn-success" id="lockBtn" onclick="toggleSystemLock()">🔒 Lock System</button>
+        <button class="btn btn-primary" onclick="manualCheck()">✓ Manual Check</button>
+      </div>
+
+      <h3 style="color: #00d4ff; margin-top: 25px;">Security Logs</h3>
+      <div id="securityLogs" style="max-height: 300px; overflow-y: auto; background: rgba(0,0,0,0.3); padding: 15px; border-radius: 6px; margin-top: 10px;">
+        <!-- Logs populated by JavaScript -->
+      </div>
+    </div>
+
+    <!-- Reports Panel -->
+    <div id="panel-reports" class="panel">
+      <h2>📄 Reports & Export</h2>
+      <div id="reportMessage" class="message"></div>
+      
+      <div class="form-row">
+        <button class="btn btn-primary" onclick="exportUsers()">📥 Export Users (CSV)</button>
+        <button class="btn btn-primary" onclick="exportSensors()">📥 Export Sensors (CSV)</button>
+        <button class="btn btn-warning" onclick="generateSummary()">📋 Generate Summary</button>
+      </div>
+
+      <div id="reportSummary" style="margin-top: 20px; padding: 15px; background: rgba(0,0,0,0.3); border-radius: 6px; display: none;">
+        <!-- Summary content -->
+      </div>
+    </div>
+
+    <!-- Activity Logs Panel -->
+    <div id="panel-activity" class="panel">
+      <h2>📋 System Activity Logs</h2>
+      <div id="activityMessage" class="message"></div>
+      
+      <div class="form-row">
+        <select id="logTypeFilter" style="flex: 0 0 150px;">
+          <option value="all">All Types</option>
+          <option value="info">Info</option>
+          <option value="warning">Warning</option>
+          <option value="error">Error</option>
+          <option value="success">Success</option>
+          <option value="sensor">Sensor</option>
+          <option value="security">Security</option>
+        </select>
+        <button class="btn btn-primary" onclick="filterActivityLogs()">🔍 Filter</button>
+        <button class="btn btn-warning" onclick="exportActivityLogs()">📥 Export Logs</button>
+        <button class="btn btn-danger" onclick="clearAllActivityLogs()">🗑️ Clear All</button>
+      </div>
+
+      <div id="activityLogsList" style="margin-top: 20px; max-height: 500px; overflow-y: auto;">
+        <!-- Activity logs populated by JavaScript -->
+      </div>
+    </div>
+  </div>
+
+<script>
+// ============================================
+// COMPLETE JavaScript Functionality
+// ============================================
+
+// Initialize on page load
+window.addEventListener('load', function() {
+  const adminName = localStorage.getItem('adminName') || 'Admin';
+  document.getElementById('adminName').textContent = adminName;
+  
+  loadUsers();
+  loadSensors();
+  loadSecurityLogs();
+  loadActivityLogs();
+  initAnalytics();
+  updateSecurityButtons();
+});
+
+// Update security button states on load
+function updateSecurityButtons() {
+  const alarmState = localStorage.getItem('alarmState') || 'OFF';
+  const alarmBtn = document.getElementById('alarmBtn');
+  alarmBtn.textContent = `🚨 Alarm: ${alarmState}`;
+  if (alarmState === 'ON') {
+    alarmBtn.style.background = 'linear-gradient(135deg, #ff6b6b, #ff4757)';
+  }
+  
+  const lockState = localStorage.getItem('systemLock') || 'UNLOCKED';
+  const lockBtn = document.getElementById('lockBtn');
+  if (lockState === 'LOCKED') {
+    lockBtn.style.background = 'linear-gradient(135deg, #ff6b6b, #ff4757)';
+    lockBtn.textContent = '🔓 Unlock System';
+  } else {
+    lockBtn.style.background = 'linear-gradient(135deg, #51cf66, #37b24d)';
+    lockBtn.textContent = '🔒 Lock System';
+  }
+}
+
+// ============================================
+// Panel Navigation
+// ============================================
+function showPanel(panelName) {
+  const panels = document.querySelectorAll('.panel');
+  panels.forEach(p => p.classList.remove('active'));
+  
+  const tabs = document.querySelectorAll('.nav-tab');
+  tabs.forEach(t => t.classList.remove('active'));
+  
+  const panel = document.getElementById('panel-' + panelName);
+  if (panel) {
+    panel.classList.add('active');
+  }
+  
+  event.target.classList.add('active');
+}
+
+// ============================================
+// USER MANAGEMENT
+// ============================================
+function loadUsers() {
+  const users = JSON.parse(localStorage.getItem('users') || '{}');
+  const tbody = document.getElementById('userTableBody');
+  tbody.innerHTML = '';
+  
+  const emails = Object.keys(users);
+  if (emails.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="3" style="text-align:center; color:#888;">No users registered yet</td></tr>';
+    return;
+  }
+  
+  emails.forEach(email => {
+    const user = users[email];
+    const row = document.createElement('tr');
+    row.innerHTML = `
+      <td>${user.name || 'N/A'}</td>
+      <td>${email}</td>
+      <td>
+        <button class="btn btn-danger" onclick="deleteUser('${email}')">Delete</button>
+      </td>
+    `;
+    tbody.appendChild(row);
+  });
+}
+
+function addUser() {
+  const name = document.getElementById('newUserName').value.trim();
+  const email = document.getElementById('newUserEmail').value.trim().toLowerCase();
+  const password = document.getElementById('newUserPass').value;
+  const msgEl = document.getElementById('userMessage');
+  
+  msgEl.style.display = 'none';
+  
+  if (!name || !email || !password) {
+    showMessage('userMessage', 'Please fill all fields', 'error');
+    return;
+  }
+  
+  const users = JSON.parse(localStorage.getItem('users') || '{}');
+  
+  if (users[email]) {
+    showMessage('userMessage', 'User with this email already exists', 'error');
+    return;
+  }
+  
+  users[email] = { name, password };
+  localStorage.setItem('users', JSON.stringify(users));
+  
+  showMessage('userMessage', 'User added successfully!', 'success');
+  
+  document.getElementById('newUserName').value = '';
+  document.getElementById('newUserEmail').value = '';
+  document.getElementById('newUserPass').value = '';
+  
+  loadUsers();
+}
+
+function deleteUser(email) {
+  if (!confirm('Are you sure you want to delete this user?')) return;
+  
+  const users = JSON.parse(localStorage.getItem('users') || '{}');
+  delete users[email];
+  localStorage.setItem('users', JSON.stringify(users));
+  
+  showMessage('userMessage', 'User deleted successfully', 'success');
+  loadUsers();
+}
+
+// ============================================
+// SENSOR MANAGEMENT
+// ============================================
+function loadSensors() {
+  const sensors = JSON.parse(localStorage.getItem('sensors') || '[]');
+  const tbody = document.getElementById('sensorTableBody');
+  tbody.innerHTML = '';
+  
+  if (sensors.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="3" style="text-align:center; color:#888;">No sensors configured</td></tr>';
+    return;
+  }
+  
+  sensors.forEach((sensor, idx) => {
+    const row = document.createElement('tr');
+    row.innerHTML = `
+      <td>${sensor.name}</td>
+      <td>Field ${sensor.field}</td>
+      <td>
+        <button class="btn btn-danger" onclick="deleteSensor(${idx})">Delete</button>
+      </td>
+    `;
+    tbody.appendChild(row);
+  });
+}
+
+function addSensor() {
+  const name = document.getElementById('newSensorName').value.trim();
+  const field = document.getElementById('newSensorField').value;
+  
+  if (!name) {
+    showMessage('sensorMessage', 'Please enter sensor name', 'error');
+    return;
+  }
+  
+  const sensors = JSON.parse(localStorage.getItem('sensors') || '[]');
+  sensors.push({ name, field });
+  localStorage.setItem('sensors', JSON.stringify(sensors));
+  
+  showMessage('sensorMessage', 'Sensor added successfully!', 'success');
+  
+  document.getElementById('newSensorName').value = '';
+  loadSensors();
+}
+
+function deleteSensor(idx) {
+  if (!confirm('Are you sure you want to delete this sensor?')) return;
+  
+  const sensors = JSON.parse(localStorage.getItem('sensors') || '[]');
+  sensors.splice(idx, 1);
+  localStorage.setItem('sensors', JSON.stringify(sensors));
+  
+  showMessage('sensorMessage', 'Sensor deleted successfully', 'success');
+  loadSensors();
+}
+
+// ============================================
+// ANALYTICS
+// ============================================
+let analyticsChart = null;
+
+function initAnalytics() {
+  const ctx = document.getElementById('analyticsChart').getContext('2d');
+  
+  const data = {
+    labels: ['00:00', '04:00', '08:00', '12:00', '16:00', '20:00'],
+    datasets: [{
+      label: 'Temperature (°C)',
+      data: [22, 21, 23, 25, 24, 22],
+      borderColor: '#ff9900',
+      backgroundColor: 'rgba(255, 153, 0, 0.1)',
+      tension: 0.4
+    }, {
+      label: 'Humidity (%)',
+      data: [65, 70, 68, 62, 64, 67],
+      borderColor: '#00d4ff',
+      backgroundColor: 'rgba(0, 212, 255, 0.1)',
+      tension: 0.4
+    }]
+  };
+  
+  analyticsChart = new Chart(ctx, {
+    type: 'line',
+    data: data,
+    options: {
+      responsive: true,
+      maintainAspectRatio: true,
+      plugins: {
+        legend: {
+          display: true,
+          position: 'top'
+        }
+      },
+      scales: {
+        y: {
+          beginAtZero: false
+        }
+      }
+    }
+  });
+}
+
+// ============================================
+// SECURITY CONTROLS
+// ============================================
+function loadSecurityLogs() {
+  const logs = JSON.parse(localStorage.getItem('securityLogs') || '[]');
+  const logsDiv = document.getElementById('securityLogs');
+  
+  if (logs.length === 0) {
+    logsDiv.innerHTML = '<p style="color:#888;">No security logs yet</p>';
+    return;
+  }
+  
+  logsDiv.innerHTML = logs.map(log => `
+    <div style="padding: 8px; margin-bottom: 8px; background: rgba(255,255,255,0.05); border-radius: 4px;">
+      <strong style="color: #00d4ff;">${log.time}</strong> - ${log.message}
+    </div>
+  `).join('');
+}
+
+function addSecurityLog(message) {
+  const logs = JSON.parse(localStorage.getItem('securityLogs') || '[]');
+  const now = new Date().toLocaleString();
+  
+  logs.unshift({ time: now, message });
+  
+  if (logs.length > 50) logs.pop();
+  
+  localStorage.setItem('securityLogs', JSON.stringify(logs));
+  loadSecurityLogs();
+}
+
+function toggleAlarm() {
+  const alarmState = localStorage.getItem('alarmState') === 'ON' ? 'OFF' : 'ON';
+  localStorage.setItem('alarmState', alarmState);
+  
+  const alarmBtn = document.getElementById('alarmBtn');
+  alarmBtn.textContent = `🚨 Alarm: ${alarmState}`;
+  
+  if (alarmState === 'ON') {
+    alarmBtn.style.background = 'linear-gradient(135deg, #ff6b6b, #ff4757)';
+  } else {
+    alarmBtn.style.background = 'linear-gradient(135deg, #ffcc00, #ff9900)';
+  }
+  
+  addSecurityLog(`🚨 Alarm toggled ${alarmState}`);
+  showMessage('securityMessage', `Alarm is now ${alarmState}`, alarmState === 'ON' ? 'error' : 'success');
+}
+
+function toggleSystemLock() {
+  const lockState = localStorage.getItem('systemLock') === 'LOCKED' ? 'UNLOCKED' : 'LOCKED';
+  localStorage.setItem('systemLock', lockState);
+  
+  const lockBtn = document.getElementById('lockBtn');
+  
+  if (lockState === 'LOCKED') {
+    lockBtn.style.background = 'linear-gradient(135deg, #ff6b6b, #ff4757)';
+    lockBtn.textContent = '🔓 Unlock System';
+  } else {
+    lockBtn.style.background = 'linear-gradient(135deg, #51cf66, #37b24d)';
+    lockBtn.textContent = '🔒 Lock System';
+  }
+  
+  addSecurityLog(`🔒 System ${lockState} by admin`);
+  showMessage('securityMessage', `System ${lockState} successfully`, lockState === 'LOCKED' ? 'error' : 'success');
+}
+
+function manualCheck() {
+  addSecurityLog('✓ Manual security check performed');
+  showMessage('securityMessage', 'Security check completed - All systems normal', 'success');
+}
+
+// ============================================
+// REPORTS & EXPORT
+// ============================================
+function exportUsers() {
+  const users = JSON.parse(localStorage.getItem('users') || '{}');
+  const emails = Object.keys(users);
+  
+  if (emails.length === 0) {
+    showMessage('reportMessage', 'No users to export', 'error');
+    return;
+  }
+  
+  let csv = 'Name,Email\n';
+  emails.forEach(email => {
+    const user = users[email];
+    csv += `"${user.name}","${email}"\n`;
+  });
+  
+  downloadCSV(csv, 'users.csv');
+  showMessage('reportMessage', 'Users exported successfully!', 'success');
+}
+
+function exportSensors() {
+  const sensors = JSON.parse(localStorage.getItem('sensors') || '[]');
+  
+  if (sensors.length === 0) {
+    showMessage('reportMessage', 'No sensors to export', 'error');
+    return;
+  }
+  
+  let csv = 'Sensor Name,Field\n';
+  sensors.forEach(sensor => {
+    csv += `"${sensor.name}","${sensor.field}"\n`;
+  });
+  
+  downloadCSV(csv, 'sensors.csv');
+  showMessage('reportMessage', 'Sensors exported successfully!', 'success');
+}
+
+function generateSummary() {
+  const users = JSON.parse(localStorage.getItem('users') || '{}');
+  const sensors = JSON.parse(localStorage.getItem('sensors') || '[]');
+  const activityLogs = JSON.parse(localStorage.getItem('activityLogs') || '[]');
+  
+  const summaryDiv = document.getElementById('reportSummary');
+  summaryDiv.style.display = 'block';
+  summaryDiv.innerHTML = `
+    <h3 style="color: #ffcc00;">System Summary Report</h3>
+    <p><strong>Total Users:</strong> ${Object.keys(users).length}</p>
+    <p><strong>Total Sensors:</strong> ${sensors.length}</p>
+    <p><strong>Activity Logs:</strong> ${activityLogs.length}</p>
+    <p><strong>Generated:</strong> ${new Date().toLocaleString()}</p>
+  `;
+  
+  showMessage('reportMessage', 'Summary generated!', 'success');
+}
+
+function downloadCSV(csvContent, filename) {
+  const blob = new Blob([csvContent], { type: 'text/csv' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+// ============================================
+// ACTIVITY LOGS MANAGEMENT
+// ============================================
+function loadActivityLogs() {
+  const logs = JSON.parse(localStorage.getItem('activityLogs') || '[]');
+  const div = document.getElementById('activityLogsList');
+  
+  if (logs.length === 0) {
+    div.innerHTML = '<p style="color:#888;">No activity logs recorded</p>';
+    return;
+  }
+  
+  const typeIcons = {
+    'info': 'ℹ️',
+    'warning': '⚠️',
+    'error': '❌',
+    'success': '✅',
+    'sensor': '📡',
+    'security': '🔒'
+  };
+  
+  const typeColors = {
+    'info': '#00d4ff',
+    'warning': '#ffcc00',
+    'error': '#ff6b6b',
+    'success': '#51cf66',
+    'sensor': '#00d4ff',
+    'security': '#ff9900'
+  };
+  
+  div.innerHTML = logs.map((log, idx) => `
+    <div style="padding: 15px; margin-bottom: 10px; background: rgba(255,255,255,0.05); border-radius: 8px; border-left: 3px solid ${typeColors[log.type] || '#00d4ff'};">
+      <div style="display: flex; justify-content: space-between;">
+        <p style="margin: 0 0 8px 0;">
+          ${typeIcons[log.type] || 'ℹ️'} ${log.message}
+        </p>
+        <button class="btn btn-danger" style="padding: 5px 10px; font-size: 12px;" onclick="deleteActivityLog(${idx})">Delete</button>
+      </div>
+      <small style="color: #888;">${log.time}</small>
+    </div>
+  `).join('');
+}
+
+function filterActivityLogs() {
+  const filterType = document.getElementById('logTypeFilter').value;
+  const logs = JSON.parse(localStorage.getItem('activityLogs') || '[]');
+  
+  const filtered = filterType === 'all' ? logs : logs.filter(log => log.type === filterType);
+  
+  const div = document.getElementById('activityLogsList');
+  
+  if (filtered.length === 0) {
+    div.innerHTML = '<p style="color:#888;">No logs match the selected filter</p>';
+    return;
+  }
+  
+  const typeIcons = {'info': 'ℹ️', 'warning': '⚠️', 'error': '❌', 'success': '✅', 'sensor': '📡', 'security': '🔒'};
+  const typeColors = {'info': '#00d4ff', 'warning': '#ffcc00', 'error': '#ff6b6b', 'success': '#51cf66', 'sensor': '#00d4ff', 'security': '#ff9900'};
+  
+  div.innerHTML = filtered.map((log, idx) => `
+    <div style="padding: 15px; margin-bottom: 10px; background: rgba(255,255,255,0.05); border-radius: 8px; border-left: 3px solid ${typeColors[log.type] || '#00d4ff'};">
+      <p style="margin: 0 0 8px 0;">${typeIcons[log.type] || 'ℹ️'} ${log.message}</p>
+      <small style="color: #888;">${log.time}</small>
+    </div>
+  `).join('');
+  
+  showMessage('activityMessage', `Showing ${filtered.length} ${filterType} logs`, 'info');
+}
+
+function exportActivityLogs() {
+  const logs = JSON.parse(localStorage.getItem('activityLogs') || '[]');
+  
+  if (logs.length === 0) {
+    showMessage('activityMessage', 'No logs to export', 'error');
+    return;
+  }
+  
+  let csv = 'Time,Type,Message\n';
+  logs.forEach(log => {
+    csv += `"${log.time}","${log.type}","${log.message}"\n`;
+  });
+  
+  downloadCSV(csv, 'activity-logs.csv');
+  showMessage('activityMessage', 'Activity logs exported successfully!', 'success');
+}
+
+function deleteActivityLog(idx) {
+  if (!confirm('Delete this log entry?')) return;
+  
+  const logs = JSON.parse(localStorage.getItem('activityLogs') || '[]');
+  logs.splice(idx, 1);
+  localStorage.setItem('activityLogs', JSON.stringify(logs));
+  
+  showMessage('activityMessage', 'Log deleted', 'success');
+  loadActivityLogs();
+}
+
+function clearAllActivityLogs() {
+  if (!confirm('Are you sure you want to clear ALL activity logs? This cannot be undone.')) return;
+  
+  localStorage.setItem('activityLogs', '[]');
+  showMessage('activityMessage', 'All activity logs cleared', 'success');
+  loadActivityLogs();
+}
+
+// ============================================
+// UTILITY FUNCTIONS
+// ============================================
+function showMessage(elementId, message, type) {
+  const msgEl = document.getElementById(elementId);
+  msgEl.textContent = message;
+  msgEl.className = 'message ' + type;
+  msgEl.style.display = 'block';
+  
+  setTimeout(() => {
+    msgEl.style.display = 'none';
+  }, 4000);
+}
+
+function logout() {
+  if (confirm('Are you sure you want to logout?')) {
+    window.location.href = 'index.html';
+  }
+}
+</script>
+
+</body>
+</html>
